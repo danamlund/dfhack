@@ -957,8 +957,7 @@ df::unit *Gui::getAnyUnit(df::viewscreen *top)
     {
         if (screen->unit) {
             // in (r)eports -> enter
-            auto *report = vector_get(screen->reports, screen->sel_idx);
-            if (report)
+            if (auto *report = vector_get(screen->reports, screen->sel_idx))
             {
                 for (df::unit *unit : world->units.all)
                 {
@@ -975,7 +974,7 @@ df::unit *Gui::getAnyUnit(df::viewscreen *top)
             }
         } else {
             // in (a)nnouncements
-            return NULL; // cannot determine unit from reports
+            return NULL; // cannot find unit from announcements
         }
     }
 
@@ -1024,15 +1023,15 @@ df::unit *Gui::getAnyUnit(df::viewscreen *top)
     switch (ui->main.mode) {
     case ViewUnits:
     {
-        if (!ui_selected_unit || !ui_selected_unit)
-            return NULL;
+        if (world && ui_selected_unit)
+            return vector_get(world->units.active, *ui_selected_unit);
 
-        return vector_get(world->units.active, *ui_selected_unit);
+        return NULL;
     }
     case ZonesPitInfo: // (i) zone -> (P)it
     case ZonesPenInfo: // (i) zone -> pe(N)
     {
-        if (ui_building_assign_units || ui_building_item_cursor)
+        if (ui_building_assign_units && ui_building_item_cursor)
             return vector_get(*ui_building_assign_units, *ui_building_item_cursor);
 
         return NULL;
